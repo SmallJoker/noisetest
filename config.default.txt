@@ -1,0 +1,42 @@
+--[[#####################################
+###    CONFIGURATION FOR NOISETEST    ###
+#      Please only change the file      #
+#   "settings_defaults.conf" in your    #
+#            world folder               #
+#---------------------------------------#
+#  Delete "map.sqlite" or the "map.db"  #
+#    folder after important changes     #
+#######################################]]
+
+-- general settings
+noisetest_params.amazing_leaves = true	--plantlike leaves? X-form
+noisetest_params.generate_cliffs = true	--generate cliffs and sand/dirt beaches
+noisetest_params.limit_top = 256		--highest point of map to generate (save CPU time)
+noisetest_params.water_level = 1		--water starts here
+noisetest_params.beaches_y_start = 3	--(sand/)dirt beaches start
+noisetest_params.beaches_y_end = -10	--(sand/)dirt beaches end
+
+noisetest_params.cave_style = 1			--0) off 1) natural, slow 2) symmetric, medium speed
+-- Lava caves: 1,2..) off, 0.5) every 4th cave 0) every 2nd cave -1) full lava
+noisetest_params.lava_amount = 0.8
+
+--chances to spawn something
+noisetest_params.ore_chance = 8*8*8
+noisetest_params.ore_min_chance = 6*6*6
+--forest factor: increases the chance to spawn a tree
+noisetest_params.forest_factor = 14*14
+noisetest_params.apple_tree_chance = 16*16
+noisetest_params.jungle_tree_chance = 7*7
+noisetest_params.flora_chance = 14*14
+noisetest_params.grass_chance = 8*8
+noisetest_params.jungle_grass_chance = 4*4
+noisetest_params.cactus_chance = 16*16
+noisetest_params.papyrus_chance = 8*8
+
+--biome settings, experimental
+noisetest_params.hot_desert = 6.4	--more desert sand, not very important	(higher = smaller)
+noisetest_params.desert = 5.6		--desert biome							(higher = smaller)
+noisetest_params.jungle = 4.5		--at the border of grassland to desert	(higher = smaller)
+noisetest_params.arctic = -4.5		--snowy biome							(lower = smaller)
+noisetest_params.cold_arctic = -5.6	--where water freezes and snow appears	(lower = smaller)
+noisetest_params.very_cold = -6.4	--ice everywhere						(lower = smaller)
