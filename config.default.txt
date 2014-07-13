@@ -11,6 +11,7 @@
 -- general settings
 noisetest_params.amazing_leaves = true	--plantlike leaves? X-form
 noisetest_params.generate_cliffs = true	--generate cliffs and sand/dirt beaches
+noisetest_params.area_flatten = true	--creates some flat parts..
 noisetest_params.limit_top = 256		--highest point of map to generate (save CPU time)
 noisetest_params.water_level = 1		--water starts here
 noisetest_params.beaches_y_start = 3	--(sand/)dirt beaches start

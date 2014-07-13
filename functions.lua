@@ -170,6 +170,7 @@ function noisetest.load_seed()
 	noisetest_params.np_cliffs.seed = seeds[3]
 	noisetest_params.np_caves.seed = seeds[1]
 	noisetest_params.np_trees.seed = seeds[2]
+	noisetest_params.np_flatten.seed = seeds[3]
 	return success
 end
 

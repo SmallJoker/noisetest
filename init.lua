@@ -51,6 +51,14 @@ noisetest_params.np_caves = {
 	persist = 0.2
 }
 
+noisetest_params.np_flatten = {
+	offset = 0,
+	scale = 1,
+	spread = {x=32, y=32, z=32},
+	octaves = 2,
+	persist = 0.2
+}
+
 -- Stuff
 dofile(noisetest.mod_path.."/functions.lua")
 if noisetest.load_data() then
@@ -83,7 +91,7 @@ minetest.register_chatcommand("regenerate", {
 })
 
 local biomes = { VERY_COLD = -3, COLD_ARCTIC = -2, ARCTIC = -1, GRASS = 0, JUNGLE = 1, DESERT = 2, HOT_DESERT = 3}
-local lastPos = {x=1,y=1,z=1}
+local lastPos = {x=6.66,y=6.66,z=6.66}
 
 noisetest.generate = function(minp, maxp, seed)
 	if vector.equals(minp, lastPos) then
@@ -123,8 +131,9 @@ noisetest.generate = function(minp, maxp, seed)
 	
 	local chulens = {x=sidelen, y=sidelen, z=sidelen}
 	local nvals_base = minetest.get_perlin_map(noisetest_params.np_base, chulens):get2dMap_flat({x=minp.x, y=minp.z})
-	local nvals_biome, nvals_cliffs, nvals_caves
+	local nvals_biome, nvals_cliffs, nvals_caves, nvals_flatten
 	if doBiomes then -- limits
+		nvals_flatten = minetest.get_perlin_map(noisetest_params.np_flatten, chulens):get2dMap_flat({x=minp.x, y=minp.z})
 		nvals_biome = minetest.get_perlin_map(noisetest_params.np_biome, chulens):get2dMap_flat({x=minp.x, y=minp.z})
 		nvals_trees = minetest.get_perlin_map(noisetest_params.np_trees, chulens):get2dMap_flat({x=minp.x, y=minp.z})
 		if noisetest_params.generate_cliffs then
@@ -186,9 +195,9 @@ noisetest.generate = function(minp, maxp, seed)
 			end
 			
 			if ysurf < 80 and ysurf > -30 and canyon ~= 0 then -- canyons
-				local depth = (1 - canyon) * 5
+				local depth = (1 - canyon) * 6
 				ysurf = ysurf - depth
-				if depth > 3.1 then
+				if depth > 4.1 then
 					river_water = true
 				end
 			end
@@ -200,14 +209,57 @@ noisetest.generate = function(minp, maxp, seed)
 				end
 			end
 			
-			biome_cache[nixz] = {biome, river_water, sand, under, snow}
+			biome_cache[nixz] = {biome, river_water, sand, under, snow, n_biome}
 		end
 		if ysurf > noisetest_params.limit_top then
 			ysurf = noisetest_params.limit_top
 		end
 		
-		ysurf_cache[nixz] = math.floor(ysurf + 0.5)
+		ysurf_cache[nixz] = ysurf
 		nixz = nixz + 1
+	end
+	end
+	
+	if doBiomes and noisetest_params.area_flatten then
+	--Flatten
+	local maxIndx = nixz
+	for x = 4, sidelen - 4, 4 do
+	for z = 4, sidelen - 4, 4 do
+		nixz = (z * sidelen) + x
+		local n_flatten = nvals_flatten[nixz] * 5 + 2
+		local biome = biome_cache[nixz][6]
+		if n_flatten > 2 and math.abs(biome) > 0.8 then
+			n_flatten = math.floor(n_flatten + 0.5)
+			if n_flatten > 4 then n_flatten = 4 end
+			
+			local avg, count = 0, 0
+			for i = -n_flatten, n_flatten do --x
+			for j = -n_flatten, n_flatten do --z
+				if (i * i) + (j * j) < n_flatten * n_flatten * 1.4 then
+					local g = ((z + j) * sidelen) + (x + i)
+					if g < maxIndx and g > 0 then
+						avg = avg + ysurf_cache[g]
+						count = count + 1
+					end
+				end
+			end
+			end
+			
+			if count > 3 then
+				local heigh = avg / count + 0.7
+				for i = -n_flatten, n_flatten do --x
+				for j = -n_flatten, n_flatten do --z
+					if (i * i) + (j * j) < n_flatten * n_flatten * 1.4 then
+						local g = ((z + j) * sidelen) + (x + i)
+						if g < maxIndx and g > 0 then
+							ysurf_cache[g] = heigh
+						end
+					end
+				end
+				end
+			end
+		end
+	end
 	end
 	end
 	
@@ -218,7 +270,7 @@ noisetest.generate = function(minp, maxp, seed)
 		local vi = area:index(minp.x, y, z)
 		local via = area:index(minp.x, y+1, z)
 		for x = minp.x, maxp.x do
-			local ysurf = ysurf_cache[nixz]
+			local ysurf = math.floor(ysurf_cache[nixz] + 0.5)
 			local biome, under = biomes.GRASS, 0
 			local river_water, sand, snow = false, false, false
 			local stone = noisetest.c_stone
