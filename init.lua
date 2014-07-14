@@ -147,8 +147,8 @@ noisetest.generate = function(minp, maxp, seed)
 	local ysurf_cache = {}
 	local biome_cache = {}
 	local nixz = 1
-	for x = minp.x, maxp.x do
 	for z = minp.z, maxp.z do
+	for x = minp.x, maxp.x do
 		local ysurf = (nvals_base[nixz] * 60)	--surface Y
 		local biome, under = biomes.GRASS, noisetest.c_dirt
 		local canyon, river_water, sand = 0, false, true --defaults
@@ -223,14 +223,14 @@ noisetest.generate = function(minp, maxp, seed)
 	if doBiomes and noisetest_params.area_flatten then
 	--Flatten
 	local maxIndx = nixz
-	for x = 4, sidelen - 4, 4 do
-	for z = 4, sidelen - 4, 4 do
+	for z = 4, sidelen - 4, 2 do
+	for x = 4, sidelen - 4, 2 do
 		nixz = (z * sidelen) + x
-		local n_flatten = nvals_flatten[nixz] * 5 + 2
+		local n_flatten = nvals_flatten[nixz] * 5 + 1
 		local biome = biome_cache[nixz][6]
-		if n_flatten > 2 and math.abs(biome) > 0.8 then
+		if n_flatten > 1.5 and math.abs(biome) > 0.8 then
 			n_flatten = math.floor(n_flatten + 0.5)
-			if n_flatten > 4 then n_flatten = 4 end
+			if n_flatten > 3 then n_flatten = 3 end
 			
 			local avg, count = 0, 0
 			for i = -n_flatten, n_flatten do --x
@@ -246,7 +246,7 @@ noisetest.generate = function(minp, maxp, seed)
 			end
 			
 			if count > 3 then
-				local heigh = avg / count + 0.7
+				local heigh = avg / count
 				for i = -n_flatten, n_flatten do --x
 				for j = -n_flatten, n_flatten do --z
 					if (i * i) + (j * j) < n_flatten * n_flatten * 1.4 then
@@ -378,7 +378,7 @@ noisetest.generate = function(minp, maxp, seed)
 						if biome <= biomes.VERY_COLD then
 							data[vi] = noisetest.c_ice
 						else
-							if snow or math.random(6) == 2 then
+							if math.random(6) == 2 then
 								data[vi] = noisetest.c_ice
 							else
 								data[vi] = noisetest.c_water
